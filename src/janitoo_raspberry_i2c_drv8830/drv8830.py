@@ -205,7 +205,7 @@ class Minimoto(object):
         self._device.write8(self.__DRV8830_CONTROL, 0x03)#brake
         return 1
 
-    def getFault(self):
+    def get_fault(self):
         """
         #Return the fault status of the DRV8830 chip. Also clears any existing faults.
         """
