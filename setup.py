@@ -100,8 +100,5 @@ setup(
         "janitoo.components": [
             "rpii2c.minimoto = janitoo_raspberry_i2c_drv8830.drv8830:make_minimoto",
         ],
-        "rpii2c.extensions": [
-            "drv8830 = janitoo_raspberry_i2c_drv8830.bus_drv8830:extend",
-        ],
     },
 )

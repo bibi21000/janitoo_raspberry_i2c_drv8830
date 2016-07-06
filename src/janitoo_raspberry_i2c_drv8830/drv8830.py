@@ -154,3 +154,61 @@ class MinimotoComponent(JNTComponent):
         except Exception:
             logger.exception('[%s] - Exception when setting speed')
 
+
+class Minimoto(object):
+
+    # DRV8830 Registers
+    __DRV8830_CONTROL           = 0x00
+    __DRV8830_FAULT             = 0x01
+
+    # Constructor
+    def __init__(self, i2c, address, debug=False):
+        """
+        """
+        if i2c is None:
+            import Adafruit_GPIO.I2C as I2C
+            i2c = I2C
+        self._device = i2c.get_i2c_device( address, **kwargs )
+
+    def drive(self, speed):
+        """
+        #Send the drive command over I2C to the DRV8830 chip. Bits 7:2 are the speed
+        #setting; range is 0-63. Bits 1:0 are the mode setting:
+        #- 00 = Standby/coast(HI-Z)
+        #- 01 = Reverse
+        #- 10 = Forward
+        #- 11 = brake(H-H)
+        """
+        self._device.write8(self.__DRV8830_FAULT, 0x80) #Clear the fault status.
+        speedval = abs(speed)
+        if speedval > 63:            #Cap the value at 63
+            speedval = 63
+        speedval = speedval << 2  #Left shift to make room for bits 1:0
+        if speed < 0:             #Set bits 1:0 based on sign of input
+            speedval |= 0x01 #Reverse
+        else:
+            speedval |= 0x02 #Forward
+            self._device.write8(self.__DRV8830_CONTROL, speedval) #control the moto
+        return 1
+
+    def stop(self):
+        """
+        #Coast to a stop by hi-z'ing the drivers.
+        """
+        self._device.write8(self.__DRV8830_CONTROL, 0x00) #Standby
+        return 1
+
+    def brake(self):
+        """
+        #Stop the motor by providing a heavy load on it.
+        """
+        self._device.write8(self.__DRV8830_CONTROL, 0x03)#brake
+        return 1
+
+    def getFault(self):
+        """
+        #Return the fault status of the DRV8830 chip. Also clears any existing faults.
+        """
+        fault = self._device.readU8(self.__DRV8830_FAULT)
+        self._device.write8(self.__DRV8830_FAULT, 0x80) #Clear the fault status.
+        return fault
