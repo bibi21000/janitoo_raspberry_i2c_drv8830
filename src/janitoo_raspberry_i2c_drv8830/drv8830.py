@@ -63,48 +63,40 @@ class MinimotoComponent(JNTComponent):
         JNTComponent.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 product_name=product_name, product_type=product_type, **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
-        uuid="speed"
-        self.values[uuid] = self.value_factory['config_byte'](options=self.options, uuid=uuid,
+        uuid="addr"
+        self.values[uuid] = self.value_factory['config_array'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
-            help='The speed of the motor. A byte from 0 to 255',
-            label='Speed',
-            default=0,
-            set_data_cb=self.set_speed,
+            help='The addresses of the motors separated by |',
+            label='Adds',
+            default='0x60|0x61',
         )
-        uuid="max_speed"
-        self.values[uuid] = self.value_factory['config_byte'](options=self.options, uuid=uuid,
+        uuid="drive"
+        self.values[uuid] = self.value_factory['action_string'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
-            help="The max speed supported by the motor. Some motor doesn't seems support 100% PWM. A byte from 0 to 255",
-            label='Speed',
-            default=255,
-        )
-        uuid="num"
-        self.values[uuid] = self.value_factory['config_byte'](options=self.options, uuid=uuid,
-            node_uuid=self.uuid,
-            help='The number of the motor on the Hat board. A byte from 1 to 4',
-            label='Num.',
-        )
-        uuid="actions"
-        self.values[uuid] = self.value_factory['action_list'](options=self.options, uuid=uuid,
-            node_uuid=self.uuid,
-            help='The action on the DC motor',
-            label='Actions',
-            list_items=['forward', 'backward', 'release'],
-            default='release',
-            set_data_cb=self.set_action,
-            is_writeonly = True,
+            help='Drive the motor(s). Send a single value to apply to all motors or values separated with |',
+            label='Drive',
+            default='0',
+            set_data_cb=self.set_drive,
             cmd_class=COMMAND_MOTOR,
-            genre=0x01,
         )
-        uuid="current_speed"
-        self.values[uuid] = self.value_factory['sensor_integer'](options=self.options, uuid=uuid,
+        uuid="stop"
+        self.values[uuid] = self.value_factory['action_string'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
-            help='The current speed of the motor. An integer from -255 to 255',
-            label='CSpeed',
-            get_data_cb=self.get_current_speed,
+            help='Stop the motor(s). Send a single value to apply to all motors or values separated with |',
+            label='Stop',
+            default='0',
+            set_data_cb=self.set_stop,
+            cmd_class=COMMAND_MOTOR,
         )
-        poll_value = self.values[uuid].create_poll_value(default=300)
-        self.values[poll_value.uuid] = poll_value
+        uuid="brake"
+        self.values[uuid] = self.value_factory['action_string'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='Brake the motor(s). Send a single value to apply to all motors or values separated with |',
+            label='Brake',
+            default='0',
+            set_data_cb=self.set_brake,
+            cmd_class=COMMAND_MOTOR,
+        )
 
     def get_current_speed(self, node_uuid, index):
         """Get the current speed
@@ -117,8 +109,8 @@ class MinimotoComponent(JNTComponent):
         else:
             return 0
 
-    def set_speed(self, node_uuid, index, data):
-        """Set the speed ot the motor
+    def set_drive(self, node_uuid, index, data):
+        """Set the drive of the motor
         """
         self.values['speed'].set_data_index(index=index, data=data)
         try:
@@ -132,40 +124,33 @@ class MinimotoComponent(JNTComponent):
         except Exception:
             logger.exception('[%s] - Exception when setting speed')
 
-    def set_action(self, node_uuid, index, data):
-        """Act on the motor
+    def set_stop(self, node_uuid, index, data):
+        """Set the stop of the motor
         """
-        params = {}
-        if data == "forward":
-            try:
-                m = self.values['num'].get_data_index(index=index)
-                if m is not None:
-                    self._bus.i2c_acquire()
-                    try:
-                        self._bus.drv8830_manager.getMotor(m).run(Adafruit_MotorHAT.FORWARD)
-                    finally:
-                        self._bus.i2c_release()
-            except Exception:
-                logger.exception('[%s] - Exception when running forward')
-        elif data == "backward":
-            try:
-                m = self.values['num'].get_data_index(index=index)
-                if m is not None:
-                    self._bus.i2c_acquire()
-                    try:
-                        self._bus.drv8830_manager.getMotor(m).run(Adafruit_MotorHAT.BACKWARD)
-                    finally:
-                        self._bus.i2c_release()
-            except Exception:
-                logger.exception('[%s] - Exception when running backward')
-        elif data == "release":
+        self.values['speed'].set_data_index(index=index, data=data)
+        try:
             m = self.values['num'].get_data_index(index=index)
             if m is not None:
+                self._bus.i2c_acquire()
                 try:
-                    self._bus.i2c_acquire()
-                    try:
-                        self._bus.drv8830_manager.getMotor(m).run(Adafruit_MotorHAT.RELEASE)
-                    finally:
-                        self._bus.i2c_release()
-                except Exception:
-                    logger.exception('[%s] - Exception when releasing one motor %s', self.__class__.__name__, m)
+                    self._bus.drv8830_manager.getMotor(m).setSpeed(data)
+                finally:
+                    self._bus.i2c_release()
+        except Exception:
+            logger.exception('[%s] - Exception when setting speed')
+
+    def set_brake(self, node_uuid, index, data):
+        """Set the brake ot the motor
+        """
+        self.values['speed'].set_data_index(index=index, data=data)
+        try:
+            m = self.values['num'].get_data_index(index=index)
+            if m is not None:
+                self._bus.i2c_acquire()
+                try:
+                    self._bus.drv8830_manager.getMotor(m).setSpeed(data)
+                finally:
+                    self._bus.i2c_release()
+        except Exception:
+            logger.exception('[%s] - Exception when setting speed')
+

@@ -54,7 +54,7 @@ class TestDrv8830Serser(JNTTServer, JNTTServerCommon):
     broker_password = 'toto'
     server_class = PiServer
     server_conf = "tests/data/janitoo_raspberry_i2c_drv8830.conf"
-    hadds = [HADD%(140,0), HADD%(140,1), HADD%(140,2)]
+    hadds = [HADD%(140,0), HADD%(140,1)]
 
     def test_011_start_reload_stop(self):
         self.skipRasperryTest()
