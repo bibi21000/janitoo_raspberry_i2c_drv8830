@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
-"""The Raspberry camera worker
-
-Installation :
-
-.. code-block:: bash
-
-    sudo apt-get install python-pycamera
-
+"""The Raspberry srv8830 worker
 """
 
 __license__ = """
@@ -33,33 +26,6 @@ __copyright__ = "Copyright © 2013-2014-2015-2016 Sébastien GALLET aka bibi2100
 # Set default logging handler to avoid "No handler found" warnings.
 import logging
 logger = logging.getLogger(__name__)
-
-try:
-    from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_StepperMotor, Adafruit_DCMotor
-    from Adafruit_MotorHAT.Adafruit_PWM_Servo_Driver import PWM
-except IOError:
-
-    class Adafruit_MotorHAT(object):
-        """ Fake class to allow buil on Continuous Integration tools.
-        """
-        pass
-
-    class Adafruit_StepperMotor(object):
-        """ Fake class to allow buil on Continuous Integration tools.
-        """
-        pass
-
-    class Adafruit_DCMotor(object):
-        """ Fake class to allow buil on Continuous Integration tools.
-        """
-        pass
-
-    class PWM(object):
-        """ Fake class to allow buil on Continuous Integration tools.
-        """
-        pass
-
-    logger.exception("Can't import Adafruit_MotorHAT")
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -137,7 +103,7 @@ class Drv8830Manager(Adafruit_MotorHAT):
     Maybe we must control the pin use (ie to not activate a led on the
     """
 
-    def __init__(self, addr = 0x40, freq = 1600):
+    def __init__(self, addr = 0x61, freq = 1600):
         """Init
         """
         self._i2caddr = addr        # default addr
