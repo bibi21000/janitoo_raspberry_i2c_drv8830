@@ -50,7 +50,6 @@ from janitoo_raspberry_i2c import OID
 def make_minimoto(**kwargs):
     return MinimotoComponent(**kwargs)
 
-
 class MinimotoComponent(JNTComponent):
     """ A motor component for gpio """
 

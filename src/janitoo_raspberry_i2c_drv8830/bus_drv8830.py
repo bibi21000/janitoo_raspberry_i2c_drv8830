@@ -98,7 +98,7 @@ def extend( self ):
     self.stop=stop
 
 
-class Drv8830Manager(Adafruit_MotorHAT):
+class Drv8830Manager(object):
     """To share bus with the adafruit library.
     Maybe we must control the pin use (ie to not activate a led on the
     """
