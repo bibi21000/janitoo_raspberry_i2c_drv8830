@@ -44,26 +44,11 @@ from janitoo.utils import TOPIC_NODES, TOPIC_NODES_REPLY, TOPIC_NODES_REQUEST
 from janitoo.utils import TOPIC_BROADCAST_REPLY, TOPIC_BROADCAST_REQUEST
 from janitoo.utils import TOPIC_VALUES_USER, TOPIC_VALUES_CONFIG, TOPIC_VALUES_SYSTEM, TOPIC_VALUES_BASIC
 
-import janitoo_raspberry_i2c_pca9685.bus_pca9685
-import janitoo_raspberry_i2c_pca9685.pca9685
+import janitoo_raspberry_i2c_drv8830.bus_drv8830
+import janitoo_raspberry_i2c_drv8830.drv8830
 
-class TestDcMotorComponent(JNTTComponent, JNTTComponentCommon):
+class TestMinimotoComponent(JNTTComponent, JNTTComponentCommon):
     """Test the component
     """
-    component_name = "rpii2c.dcmotor"
-
-class TestStepMotorComponent(JNTTComponent, JNTTComponentCommon):
-    """Test the component
-    """
-    component_name = "rpii2c.stepmotor"
-
-class TestPwmComponent(JNTTComponent, JNTTComponentCommon):
-    """Test the component
-    """
-    component_name = "rpii2c.pwm"
-
-class TestPanComponent(JNTTComponent, JNTTComponentCommon):
-    """Test the component
-    """
-    component_name = "rpii2c.pan"
+    component_name = "rpii2c.minimoto"
 
