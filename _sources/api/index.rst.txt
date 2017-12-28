@@ -1,0 +1,22 @@
+janitoo_raspberry_i2c_drv8830 package
+=====================================
+
+Submodules
+----------
+
+janitoo_raspberry_i2c_drv8830.drv8830 module
+--------------------------------------------
+
+.. automodule:: janitoo_raspberry_i2c_drv8830.drv8830
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: janitoo_raspberry_i2c_drv8830
+    :members:
+    :undoc-members:
+    :show-inheritance:
